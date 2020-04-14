@@ -38,4 +38,4 @@ PCB使用杜洋工作室的 LEAF20-。
 
 ### 操作方式
 
-详见[操作指南](.\操作指南.md)
+详见[操作指南](https://github.com/DT9025A/HPDL1414-Desktop-Clock/blob/master/操作指南.md)
