@@ -20,7 +20,7 @@ PCB使用杜洋工作室的 LEAF20-。
 
 ### 显示效果
 
-![](.\Images\front.jpg)
+![](https://raw.githubusercontent.com/DT9025A/HPDL1414-Desktop-Clock/master/Images/front.jpg)
 
 
 
@@ -32,7 +32,7 @@ PCB使用杜洋工作室的 LEAF20-。
 
 参考电路图如下
 
-![](.\Images\refsch.jpg)
+![](https://raw.githubusercontent.com/DT9025A/HPDL1414-Desktop-Clock/master/Images/refsch.jpg)
 
 ---
 
