@@ -1,0 +1,15 @@
+*.__i
+*.orig
+*.lst
+*.obj
+*._ia
+*.lnp
+*.m51
+hpdl
+*.plg
+*.uvopt
+*.bak
+ds18b20.*
+24c02.*
+r8025ac.*
+KICAD\
