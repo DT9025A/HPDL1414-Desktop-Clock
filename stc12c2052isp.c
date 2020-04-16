@@ -1,3 +1,8 @@
+/*************************
+	面对STC12C2052系列的片上E2PROM驱动程序
+	by DT9025A at 2020/1/15
+**************************/
+
 #include "stc12c2052isp.h"
 
 void TRIGISP (unsigned int addrOffset, unsigned char cmd) {
@@ -38,8 +43,7 @@ void BufRead (unsigned int addrOffset, unsigned int cnt, unsigned char *buf) {
 void SectorErase (unsigned char sectorNumber) {
     unsigned int addrOffset;
 
-    addrOffset = FLASH_START_ADDR;
-    addrOffset += sectorNumber * 512;
+    addrOffset = FLASH_START_ADDR + sectorNumber * 512;
 
     TRIGISP (addrOffset, ISP_IAP_SECTOR_ERASE);
 }

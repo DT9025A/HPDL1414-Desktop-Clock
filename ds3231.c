@@ -1,3 +1,9 @@
+/*********************
+	DS3231»ù´¡Çý¶¯³ÌÐò
+	by DT9025A
+	2019/8/15
+*********************/
+
 #include "ds3231.h"
 
 unsigned char HEX2BCD (unsigned char dat) {
@@ -11,10 +17,9 @@ unsigned char BCD2HEX (unsigned char dat) {
 void SetDS3231PPS (unsigned char enable) {
     unsigned char temp;
     IRcvStr (DS3231_ADD, 0x0e, &temp, 1);
-	if(enable)
-    	temp &= 0xe3;
-	else
-		temp = (temp & 0xe3) | 0x04;
+	temp &= 0xe3;
+	if(enable == 0)
+		temp |= 0x04;
 	ISendStr (DS3231_ADD, 0x0e, &temp, 1);
 }
 

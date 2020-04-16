@@ -1,3 +1,16 @@
+/*********************
+	基于STC12C4052,使用HPDL-1414和DS3231的桌面时钟
+	by DT9025A at 2020/4/12
+
+	V1.2 First Release
+	KEIL4 C51 : Program Size: data=57.1 xdata=0 code=3816
+
+	V1.3
+	修正了PPS可能不同步的BUG
+	更新了一些驱动，进一步减小体积
+	KEIL4 C51 : Program Size: data=57.1 xdata=0 code=3804
+********************/
+
 #include <STC12C2052AD.H>
 #include "hpdl1414.h"
 #include "VIIC_C51.h"
@@ -7,7 +20,7 @@
 //系统设置
 typedef struct {
     unsigned int SysCycle;
-    unsigned int TimeCycle;
+    unsigned int TimeCycle;		//Cycle = Sec * 200
     unsigned int TempCycle;
     unsigned char DS3231PPS;
 } SysConfigStruct;
@@ -18,8 +31,6 @@ typedef struct {
 #define MonthDateMenu_Year      2
 
 //按键检测
-#define DEA EA=0
-#define EEA EA=1
 #define WAITKEY while(K1Pressed==0&&K2Pressed==0)
 #define SINGLEPRESS_TICK 700
 
@@ -37,7 +48,10 @@ bit InConfig = 0, UpdateTime = 0, UpdateTemp = 0, K1Pressed = 0, K2Pressed = 0, 
 unsigned int sysTick = 0, lastK1Tick = 65535, lastK2Tick = 65535;
 unsigned char MonthDateMenu = MonthDateMenu_MonthDate, buf[5];
 Time time;
-SysConfigStruct config = {2400, 2000, 400, 1};
+SysConfigStruct config = {2400, 2000, 400, 0};
+
+//版本号
+char code VERSION[] = {"V1.3"};
 
 //IO
 sbit K1 = P3 ^ 2;	//INT0
@@ -92,6 +106,7 @@ bit LoadConfig () {
             config.TempCycle = _buf[2] * 200;
         config.SysCycle = config.TimeCycle + config.TempCycle;
         config.DS3231PPS = _buf[3];
+        SetDS3231PPS (_buf[3]);
         return 1;
     }
     return 0;
@@ -112,10 +127,10 @@ void SaveConfig () {
 
 //关EA后延时
 void Delay1sWithEA() {
-    DEA;
+    EA = 0;
     Delay500ms();
     Delay500ms();
-    EEA;
+    EA = 1;
 }
 
 //在指定位置格式化两位数字
@@ -147,6 +162,7 @@ unsigned char ScanKey() {
 }
 
 //显示周几
+//if 比 switch 少10字节
 void dispDOW() {
     if (time.dow == 1)
         dispString ("MON ");
@@ -366,7 +382,6 @@ CONFIG_OUT:
     K2Pressed = K1Pressed = 0;
     SaveConfig();
     Delay500ms();
-    //Delay1sWithEA();
 }
 
 //中断初始化
@@ -384,6 +399,10 @@ void main() {
 
     Interrupt_Init();
     Timer0_Init();
+
+    dispString (VERSION);
+    Delay500ms();
+
     if (LoadConfig())
         dispString ("LOAD");
     else {
@@ -424,7 +443,6 @@ void main() {
             UpdateTime = 0;
 
             MonthDateMenu = MonthDateMenu_MonthDate;
-
             GetDS3231 (&time);
             FormatDigit2 (time.hour, 0);
             FormatDigit2 (time.minute, 2);
@@ -447,7 +465,6 @@ void main() {
                 buf[1] = '0';
                 FormatDigit2 (time.year, 2);
                 dispString (buf);
-
             } else if (MonthDateMenu == MonthDateMenu_DayOfWeek) {
                 MonthDateMenu = MonthDateMenu_Year;
                 //星期
@@ -460,7 +477,6 @@ void main() {
                 FormatDigit2 (time.month, 0);
                 FormatDigit2 (time.date, 2);
                 dispString (buf);
-
             }
         }
     }
